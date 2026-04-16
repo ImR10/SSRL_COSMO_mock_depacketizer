@@ -6,7 +6,8 @@ import struct
 class TransferFrame:
     def __init__(self, raw_data):
         self.raw_data = raw_data
-        self.parse_TFPH
+        self.parse_TFPH()
+        self.payload = self.raw_data[6:]
 
     # parses the Transfer Frame Primary Header (Bytes 0-5)
     def parse_TFPH(self):
@@ -14,8 +15,8 @@ class TransferFrame:
         word1, word2, word3 = struct.unpack('>HHH', TF_primary_header)
 
         # parse the VCID, master_count, vc_count, and FHP
-        self.VCID = (word1 >> 1) & 0x07
-        self.FHP = word3 & 0x07FF
+        self.vcid = (word1 >> 1) & 0x07
+        self.fhp = word3 & 0x07FF
 
     # get byte index of where new packet starts
     def get_packet_start_index(self):
