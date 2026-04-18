@@ -1,0 +1,6 @@
+# Ignore Python cache directories recursively
+**/__pycache__/
+*.py[cod]
+
+# Ignore VS Code project settings
+.vscode/
