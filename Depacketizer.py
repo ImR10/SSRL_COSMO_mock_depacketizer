@@ -21,8 +21,6 @@ def main():
 
     except FileNotFoundError:
         print(f"Error: File {SPACE_DATA} NOT FOUND !!!")
-        
-
 
 
 if __name__ == "__main__":
