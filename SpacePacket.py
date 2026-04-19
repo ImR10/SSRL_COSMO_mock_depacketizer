@@ -4,3 +4,6 @@
 #  - packet sequence control: sequence flag, packet sequence count
 #  - packet data length
 
+class SpacePacket():
+    def __init__(self):
+        pass
