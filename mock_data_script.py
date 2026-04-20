@@ -33,6 +33,6 @@ def generate_test_file(filename="mission_data.bin"):
         frame2 = header2 + payload2
         f.write(frame2[:FRAME_SIZE])
 
-    print(f"Generated {filename}. You are ready to start coding!")
+    print(f"Generated {filename}.")
 
 generate_test_file()
