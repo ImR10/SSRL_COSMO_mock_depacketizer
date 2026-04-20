@@ -1,31 +1,42 @@
 # responsible for slicing the buffer based on TFPH
 
+from SpacePacket import SpacePacket
+
 class VirtualChannel():
     def __init__(self, vcid):
         self.vcid = vcid
-        self.packet_buffer = bytearray()
-        self.target_packet_length = 0
+        self.buffer = bytearray()
 
     def process_frame(self, frame_obj):
         payload = frame_obj.raw_data[6:]
         fhp = frame_obj.fhp
 
         if fhp == 2047:
-            # no new packet
-            self.packet_buffer.extend(payload)
+            # No new packet starts here. Just keep adding to the pile.
+            self.buffer.extend(payload)
+            return None
         else:
-            # 1. add 'tail end' to end of packet
+            # 1. extend 'tail end' of the previous packet
             packet_tail_data = payload[:fhp]
-            self.packet_buffer.extend(packet_tail_data)
+            self.buffer.extend(packet_tail_data)
 
-            # 2. If the buffer has data, packet ends so split from buffer
-        if len(self.buffer) > 0:
-            self.dispatch_completed_packet()
+            # 2. If buffer has data, packet is complete
+            finished_packet = None
+            if len(self.buffer) > 0:
+                finished_packet = self.dispatch_completed_packet()
+                
+            # 3. Start new packet from the FHP position
+            # This MUST happen after dispatching the old one
+            self.buffer = bytearray(payload[fhp:])
             
-        # 3. Start a new packet from the FHP position
-        self.buffer = bytearray(payload[fhp:])
+            return finished_packet
 
-def dispatch_completed_packet(self):
-    packet = SpacePacket(self.buffer) 
-    print(f"DEBUG: VCID {self.vcid} reconstructed a packet of {len(self.buffer)} bytes")
-    self.buffer = bytearray()
+    def dispatch_completed_packet(self):
+        # Pass the current full buffer to the SpacePacket parser
+        packet = SpacePacket(self.buffer) 
+        self.buffer = bytearray()
+
+        if packet.apid == 2047:
+            return None # Ignore fill packets
+
+        return packet
